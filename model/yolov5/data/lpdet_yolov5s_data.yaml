@@ -1,0 +1,8 @@
+train: /content/drive/MyDrive/FPT/Code/LicensePlate/FinalData/FinalData_Det/images/train
+val: /content/drive/MyDrive/FPT/Code/LicensePlate/FinalData/FinalData_Det/images/valid
+test: /content/drive/MyDrive/FPT/Code/LicensePlate/FinalData/FinalData_Det/images/test
+
+nc: 1
+
+names: ['BienSo']
+
