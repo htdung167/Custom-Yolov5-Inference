@@ -1,6 +1,45 @@
 import cv2 as cv
 import numpy as np
 
+def check_borderline(bboxes, image, margins=(5, 5, 5, 5), ratio_min = 0.6):
+    """Check border.
+    Parameters
+    ---------
+    bboxes: np.ndarray
+        Bboxes <xyxy>
+    image: np.ndarray
+        BGR
+    margins: tuple
+        margin of left top right bottom
+
+    Returns
+    ---------
+    lst_img: list
+        List drop images
+    """
+
+    h_img, w_img = image.shape[:2]
+    mar_l, mar_t, mar_r, mar_b = margins
+    for x1, y1, x2, y2 in bboxes:
+        # Check border
+        if x1 <= mar_l:
+            return False
+        elif x2 >= w_img - mar_r:
+            return False
+        elif y1 <= mar_t:
+            return False
+        elif y2 >= h_img - mar_b:
+            return False
+        
+        # Check ratio h, w
+        h_box = y2 - y1 
+        w_box = x2 - x1
+        ratio = h_box / w_box
+        if ratio < ratio_min or ratio > 1 / ratio_min:
+            return False
+    return True
+
+
 def drop_image(image, bboxes):
     """Drop image with bounding boxes.
     Parameters

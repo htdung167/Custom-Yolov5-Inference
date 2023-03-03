@@ -4,7 +4,7 @@ import cv2 as cv
 import os
 import time
 import argparse
-from utils_.general import drop_image
+from utils_.general import drop_image, check_borderline
 
 from model.yolov5_ import YOLOv5
 from configparser import ConfigParser
@@ -25,6 +25,8 @@ def run(
         show_result=False,
         save_txt=False,
         save_image=False,
+        ratio_hw_min = 0.5,
+        margins=[5,5,5,5],
         name='exp'
 ):
     #--Create save folder
@@ -65,9 +67,14 @@ def run(
             #--Predict and show result
             det_pred, det_img = model(img_org, show=show_result)  #x1y1x2y2
             
-            # Cut detected object
+            #-- Cut detected object
             det_pred = det_pred[0].cpu().detach().numpy()
             bboxes = det_pred[:, 0:4]
+
+            #-- Check border
+            check_border = check_borderline(bboxes=bboxes, image=img_org, margins=margins, ratio_min=ratio_hw_min)
+
+            # Drop image
             lst_drop_img = drop_image(img_org, bboxes)
             if show_result:
                 for dropped_img in lst_drop_img:
@@ -78,7 +85,7 @@ def run(
 
             #--Save result
             img_file = img_path.rsplit("/", 1)[-1].rsplit("\\", -1)[-1]
-            if save_image:
+            if save_image and check_border:
                 img_file = img_path.rsplit("/", 1)[-1].rsplit("\\", -1)[-1]
                 if len(lst_drop_img) > 0:
                     cv.imwrite(os.path.join(save_img_path, img_file), img_org)
@@ -88,6 +95,8 @@ def parse_opt():
     parser.add_argument('--big_source', type=str, default="data/1.jpg", help='path to a image or image folder')
     parser.add_argument('--show_result', action='store_true', help='show image and labels')
     parser.add_argument('--save_image', action='store_true', help='save dropped image results to *.jpg')
+    parser.add_argument('--ratio_hw_min', type=float, default=0.5, help='Min ratio of h/w and w/h')
+    parser.add_argument('--margins', nargs=4, type=int, default=[5, 5, 5, 5], help='margin of left top right bottom')
     parser.add_argument('--name', type=str, default="exp", help='save result to exp folder')
     opt = parser.parse_args()
     return opt

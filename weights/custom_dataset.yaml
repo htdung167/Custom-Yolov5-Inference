@@ -1,4 +1,0 @@
-train: ../yolov5_dataset_573/images/train/
-val: ../yolov5_dataset_573/images/val/
-nc: 1
-names: ['orange']
