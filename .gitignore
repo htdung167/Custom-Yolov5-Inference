@@ -1,2 +1,2 @@
-weights/yolov5_orangedetection_best.pt
-weights/custom_dataset.yaml
+experiments/
+data/

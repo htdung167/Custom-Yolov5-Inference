@@ -3,6 +3,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import sys
+import random
 from pathlib import Path
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning) 
@@ -46,12 +47,16 @@ class YOLOv5(nn.Module):
         self.scale_coords = scale_coords
         self.xyxy2xywh = xyxy2xywh
         self.letterbox = letterbox
+
+        #--Plot
+        self.list_label = list(self.names.values())
+        self.list_color = [(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(len(self.list_label))]
     
     def get_model(self):
         return self.model
 
     @torch.no_grad()
-    def forward(self, image, show=True, show_conf=True):
+    def forward(self, image, show=False, show_conf=True):
         """Predict with Yolov5
 
         Parameters
@@ -103,11 +108,11 @@ class YOLOv5(nn.Module):
                     klass = self.names[int(d[5])]
                     conf = round(float(d[4].numpy()), 2)
                     if show_conf:
-                        im0 = plot_bbox_label(im0, bboxes, label=str(klass) + " " + str(conf))
+                        im0 = plot_bbox_label(im0, bboxes, label=str(klass) + " " + str(conf), list_label=self.list_label, list_color=self.list_color)
                     else:
-                        im0 = plot_bbox_label(im0, bboxes, label=str(klass))
+                        im0 = plot_bbox_label(im0, bboxes, label=str(klass), list_label=self.list_label, list_color=self.list_color)
 
             if show:
-                cv.imshow("orange", im0)
+                cv.imshow("image", im0)
                 cv.waitKey(1)
         return pred, im0

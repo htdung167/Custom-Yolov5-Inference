@@ -1,16 +1,18 @@
 import cv2 as cv
 
-def plot_bbox_label(img, bbox, label):
+def plot_bbox_label(img, bbox, label, list_label, list_color):
     """bbox: <tl_x tl_y br_x br_y>"""
     im0 = img.copy()
     #--Draw detect result
+    ##--Color
+    color_contant = list_color[list_label.index(label.split(" ")[0])]
     ##--Bounding box
     tl_x, tl_y, br_x, br_y = bbox
     im0 = cv.rectangle(
         img=im0, 
         pt1=(int(tl_x), int(tl_y)), 
         pt2=(int(br_x), int(br_y)), 
-        color=(0, 0, 255), 
+        color=color_contant, 
         thickness=1)
     ##--Text
     label_text = label
@@ -22,7 +24,7 @@ def plot_bbox_label(img, bbox, label):
         img=im0, 
         pt1=(int(tl_x), int(tl_y) - text_size[0][1] - 3), 
         pt2=(int(tl_x) + text_size[0][0], int(tl_y)), 
-        color=(0, 0, 255), 
+        color=color_contant, 
         thickness=-1,
         lineType=cv.LINE_AA)
     cv.putText(
